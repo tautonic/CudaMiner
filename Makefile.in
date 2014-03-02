@@ -55,7 +55,8 @@ am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
 am_cudaminer_OBJECTS = cudaminer-cpu-miner.$(OBJEXT) \
 	cudaminer-util.$(OBJEXT) cudaminer-sha2.$(OBJEXT) \
-	cudaminer-scrypt.$(OBJEXT) cudaminer-scrypt-jane.$(OBJEXT) \
+	cudaminer-scrypt.$(OBJEXT) cudaminer-maxcoin.$(OBJEXT) \
+	cudaminer-sha3.$(OBJEXT) cudaminer-scrypt-jane.$(OBJEXT) \
 	salsa_kernel.$(OBJEXT) sha256.$(OBJEXT) keccak.$(OBJEXT) \
 	fermi_kernel.$(OBJEXT) kepler_kernel.$(OBJEXT) \
 	test_kernel.$(OBJEXT) nv_kernel.$(OBJEXT) nv_kernel2.$(OBJEXT) \
@@ -267,6 +268,8 @@ cudaminer_SOURCES = elist.h miner.h compat.h \
 			  cpu-miner.c util.c \
 			  sha2.c \
 			  scrypt.cpp \
+			  maxcoin.cpp \
+			  sha3.cpp sha3.h \
 			  scrypt-jane.cpp scrypt-jane.h \
 			  salsa_kernel.cu salsa_kernel.h \
 			  sha256.cu sha256.h \
@@ -383,9 +386,11 @@ distclean-compile:
 	-rm -f *.tab.c
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cudaminer-cpu-miner.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cudaminer-maxcoin.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cudaminer-scrypt-jane.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cudaminer-scrypt.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cudaminer-sha2.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cudaminer-sha3.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cudaminer-util.Po@am__quote@
 
 .c.o:
@@ -471,6 +476,34 @@ cudaminer-scrypt.obj: scrypt.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='scrypt.cpp' object='cudaminer-scrypt.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cudaminer_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o cudaminer-scrypt.obj `if test -f 'scrypt.cpp'; then $(CYGPATH_W) 'scrypt.cpp'; else $(CYGPATH_W) '$(srcdir)/scrypt.cpp'; fi`
+
+cudaminer-maxcoin.o: maxcoin.cpp
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cudaminer_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT cudaminer-maxcoin.o -MD -MP -MF $(DEPDIR)/cudaminer-maxcoin.Tpo -c -o cudaminer-maxcoin.o `test -f 'maxcoin.cpp' || echo '$(srcdir)/'`maxcoin.cpp
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/cudaminer-maxcoin.Tpo $(DEPDIR)/cudaminer-maxcoin.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='maxcoin.cpp' object='cudaminer-maxcoin.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cudaminer_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o cudaminer-maxcoin.o `test -f 'maxcoin.cpp' || echo '$(srcdir)/'`maxcoin.cpp
+
+cudaminer-maxcoin.obj: maxcoin.cpp
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cudaminer_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT cudaminer-maxcoin.obj -MD -MP -MF $(DEPDIR)/cudaminer-maxcoin.Tpo -c -o cudaminer-maxcoin.obj `if test -f 'maxcoin.cpp'; then $(CYGPATH_W) 'maxcoin.cpp'; else $(CYGPATH_W) '$(srcdir)/maxcoin.cpp'; fi`
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/cudaminer-maxcoin.Tpo $(DEPDIR)/cudaminer-maxcoin.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='maxcoin.cpp' object='cudaminer-maxcoin.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cudaminer_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o cudaminer-maxcoin.obj `if test -f 'maxcoin.cpp'; then $(CYGPATH_W) 'maxcoin.cpp'; else $(CYGPATH_W) '$(srcdir)/maxcoin.cpp'; fi`
+
+cudaminer-sha3.o: sha3.cpp
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cudaminer_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT cudaminer-sha3.o -MD -MP -MF $(DEPDIR)/cudaminer-sha3.Tpo -c -o cudaminer-sha3.o `test -f 'sha3.cpp' || echo '$(srcdir)/'`sha3.cpp
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/cudaminer-sha3.Tpo $(DEPDIR)/cudaminer-sha3.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='sha3.cpp' object='cudaminer-sha3.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cudaminer_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o cudaminer-sha3.o `test -f 'sha3.cpp' || echo '$(srcdir)/'`sha3.cpp
+
+cudaminer-sha3.obj: sha3.cpp
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cudaminer_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT cudaminer-sha3.obj -MD -MP -MF $(DEPDIR)/cudaminer-sha3.Tpo -c -o cudaminer-sha3.obj `if test -f 'sha3.cpp'; then $(CYGPATH_W) 'sha3.cpp'; else $(CYGPATH_W) '$(srcdir)/sha3.cpp'; fi`
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/cudaminer-sha3.Tpo $(DEPDIR)/cudaminer-sha3.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='sha3.cpp' object='cudaminer-sha3.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cudaminer_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o cudaminer-sha3.obj `if test -f 'sha3.cpp'; then $(CYGPATH_W) 'sha3.cpp'; else $(CYGPATH_W) '$(srcdir)/sha3.cpp'; fi`
 
 cudaminer-scrypt-jane.o: scrypt-jane.cpp
 @am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cudaminer_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT cudaminer-scrypt-jane.o -MD -MP -MF $(DEPDIR)/cudaminer-scrypt-jane.Tpo -c -o cudaminer-scrypt-jane.o `test -f 'scrypt-jane.cpp' || echo '$(srcdir)/'`scrypt-jane.cpp

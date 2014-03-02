@@ -55,7 +55,8 @@ am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
 am_cudaminer_OBJECTS = cudaminer-cpu-miner.$(OBJEXT) \
 	cudaminer-util.$(OBJEXT) cudaminer-sha2.$(OBJEXT) \
-	cudaminer-scrypt.$(OBJEXT) cudaminer-scrypt-jane.$(OBJEXT) \
+	cudaminer-scrypt.$(OBJEXT) cudaminer-maxcoin.$(OBJEXT) \
+	cudaminer-sha3.$(OBJEXT) cudaminer-scrypt-jane.$(OBJEXT) \
 	salsa_kernel.$(OBJEXT) sha256.$(OBJEXT) keccak.$(OBJEXT) \
 	fermi_kernel.$(OBJEXT) kepler_kernel.$(OBJEXT) \
 	test_kernel.$(OBJEXT) nv_kernel.$(OBJEXT) nv_kernel2.$(OBJEXT) \
@@ -134,13 +135,13 @@ distuninstallcheck_listfiles = find . -type f -print
 am__distuninstallcheck_listfiles = $(distuninstallcheck_listfiles) \
   | sed 's|^\./|$(prefix)/|' | grep -v '$(infodir)/dir$$'
 distcleancheck_listfiles = find . -type f -print
-ACLOCAL = ${SHELL} /home/buchner/CudaMiner/missing --run aclocal-1.11
+ACLOCAL = ${SHELL} /home/marcin/dev/CudaMiner/missing --run aclocal-1.11
 ALLOCA = 
 AMTAR = $${TAR-tar}
-AUTOCONF = ${SHELL} /home/buchner/CudaMiner/missing --run autoconf
-AUTOHEADER = ${SHELL} /home/buchner/CudaMiner/missing --run autoheader
-AUTOMAKE = ${SHELL} /home/buchner/CudaMiner/missing --run automake-1.11
-AWK = gawk
+AUTOCONF = ${SHELL} /home/marcin/dev/CudaMiner/missing --run autoconf
+AUTOHEADER = ${SHELL} /home/marcin/dev/CudaMiner/missing --run autoheader
+AUTOMAKE = ${SHELL} /home/marcin/dev/CudaMiner/missing --run automake-1.11
+AWK = mawk
 CC = gcc -std=gnu99
 CCAS = gcc -std=gnu99
 CCASDEPMODE = depmode=gcc3
@@ -174,10 +175,10 @@ LDFLAGS =
 LIBCURL = -L/usr/lib/x86_64-linux-gnu -lcurl -Wl,-Bsymbolic-functions -Wl,-z,relro
 LIBCURL_CPPFLAGS = 
 LIBOBJS = 
-LIBS = 
+LIBS = -lcrypto -lssl 
 LTLIBOBJS = 
 MAINT = #
-MAKEINFO = ${SHELL} /home/buchner/CudaMiner/missing --run makeinfo
+MAKEINFO = ${SHELL} /home/marcin/dev/CudaMiner/missing --run makeinfo
 MKDIR_P = /bin/mkdir -p
 NVCC = nvcc
 OBJEXT = o
@@ -185,10 +186,10 @@ OPENMP_CFLAGS = -fopenmp
 PACKAGE = cudaminer
 PACKAGE_BUGREPORT = 
 PACKAGE_NAME = cudaminer
-PACKAGE_STRING = cudaminer 2014.02.02
+PACKAGE_STRING = cudaminer 2014.02.18
 PACKAGE_TARNAME = cudaminer
 PACKAGE_URL = 
-PACKAGE_VERSION = 2014.02.02
+PACKAGE_VERSION = 2014.02.18
 PATH_SEPARATOR = :
 PTHREAD_FLAGS = -pthread
 PTHREAD_LIBS = -lpthread
@@ -196,13 +197,13 @@ RANLIB = ranlib
 SET_MAKE = 
 SHELL = /bin/bash
 STRIP = 
-VERSION = 2014.02.02
+VERSION = 2014.02.18
 WS2_LIBS = 
 _libcurl_config = 
-abs_builddir = /home/buchner/CudaMiner
-abs_srcdir = /home/buchner/CudaMiner
-abs_top_builddir = /home/buchner/CudaMiner
-abs_top_srcdir = /home/buchner/CudaMiner
+abs_builddir = /home/marcin/dev/CudaMiner
+abs_srcdir = /home/marcin/dev/CudaMiner
+abs_top_builddir = /home/marcin/dev/CudaMiner
+abs_top_srcdir = /home/marcin/dev/CudaMiner
 ac_ct_CC = gcc
 ac_ct_CXX = g++
 am__include = include
@@ -230,7 +231,7 @@ host_vendor = unknown
 htmldir = ${docdir}
 includedir = ${prefix}/include
 infodir = ${datarootdir}/info
-install_sh = ${SHELL} /home/buchner/CudaMiner/install-sh
+install_sh = ${SHELL} /home/marcin/dev/CudaMiner/install-sh
 libdir = ${exec_prefix}/lib
 libexecdir = ${exec_prefix}/libexec
 localedir = ${datarootdir}/locale
@@ -267,6 +268,8 @@ cudaminer_SOURCES = elist.h miner.h compat.h \
 			  cpu-miner.c util.c \
 			  sha2.c \
 			  scrypt.cpp \
+			  maxcoin.cpp \
+			  sha3.cpp sha3.h \
 			  scrypt-jane.cpp scrypt-jane.h \
 			  salsa_kernel.cu salsa_kernel.h \
 			  sha256.cu sha256.h \
@@ -279,7 +282,7 @@ cudaminer_SOURCES = elist.h miner.h compat.h \
 			  titan_kernel.cu titan_kernel.h
 
 cudaminer_LDFLAGS = $(PTHREAD_FLAGS) -L/usr/local/cuda/lib64
-cudaminer_LDADD = -L/usr/lib/x86_64-linux-gnu -lcurl -Wl,-Bsymbolic-functions -Wl,-z,relro compat/jansson/libjansson.a -lpthread  -lcudart -fopenmp 
+cudaminer_LDADD = -L/usr/lib/x86_64-linux-gnu -lcurl -Wl,-Bsymbolic-functions -Wl,-z,relro compat/jansson/libjansson.a -lpthread  -lcudart -fopenmp -lcrypto -lssl 
 cudaminer_CPPFLAGS = -msse2  -fopenmp $(PTHREAD_FLAGS) -fno-strict-aliasing $(JANSSON_INCLUDES) -DSCRYPT_KECCAK512 -DSCRYPT_CHACHA -DSCRYPT_CHOOSE_COMPILETIME
 all: cpuminer-config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-recursive
@@ -383,9 +386,11 @@ distclean-compile:
 	-rm -f *.tab.c
 
 include ./$(DEPDIR)/cudaminer-cpu-miner.Po
+include ./$(DEPDIR)/cudaminer-maxcoin.Po
 include ./$(DEPDIR)/cudaminer-scrypt-jane.Po
 include ./$(DEPDIR)/cudaminer-scrypt.Po
 include ./$(DEPDIR)/cudaminer-sha2.Po
+include ./$(DEPDIR)/cudaminer-sha3.Po
 include ./$(DEPDIR)/cudaminer-util.Po
 
 .c.o:
@@ -471,6 +476,34 @@ cudaminer-scrypt.obj: scrypt.cpp
 #	source='scrypt.cpp' object='cudaminer-scrypt.obj' libtool=no \
 #	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
 #	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cudaminer_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o cudaminer-scrypt.obj `if test -f 'scrypt.cpp'; then $(CYGPATH_W) 'scrypt.cpp'; else $(CYGPATH_W) '$(srcdir)/scrypt.cpp'; fi`
+
+cudaminer-maxcoin.o: maxcoin.cpp
+	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cudaminer_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT cudaminer-maxcoin.o -MD -MP -MF $(DEPDIR)/cudaminer-maxcoin.Tpo -c -o cudaminer-maxcoin.o `test -f 'maxcoin.cpp' || echo '$(srcdir)/'`maxcoin.cpp
+	$(am__mv) $(DEPDIR)/cudaminer-maxcoin.Tpo $(DEPDIR)/cudaminer-maxcoin.Po
+#	source='maxcoin.cpp' object='cudaminer-maxcoin.o' libtool=no \
+#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
+#	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cudaminer_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o cudaminer-maxcoin.o `test -f 'maxcoin.cpp' || echo '$(srcdir)/'`maxcoin.cpp
+
+cudaminer-maxcoin.obj: maxcoin.cpp
+	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cudaminer_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT cudaminer-maxcoin.obj -MD -MP -MF $(DEPDIR)/cudaminer-maxcoin.Tpo -c -o cudaminer-maxcoin.obj `if test -f 'maxcoin.cpp'; then $(CYGPATH_W) 'maxcoin.cpp'; else $(CYGPATH_W) '$(srcdir)/maxcoin.cpp'; fi`
+	$(am__mv) $(DEPDIR)/cudaminer-maxcoin.Tpo $(DEPDIR)/cudaminer-maxcoin.Po
+#	source='maxcoin.cpp' object='cudaminer-maxcoin.obj' libtool=no \
+#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
+#	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cudaminer_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o cudaminer-maxcoin.obj `if test -f 'maxcoin.cpp'; then $(CYGPATH_W) 'maxcoin.cpp'; else $(CYGPATH_W) '$(srcdir)/maxcoin.cpp'; fi`
+
+cudaminer-sha3.o: sha3.cpp
+	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cudaminer_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT cudaminer-sha3.o -MD -MP -MF $(DEPDIR)/cudaminer-sha3.Tpo -c -o cudaminer-sha3.o `test -f 'sha3.cpp' || echo '$(srcdir)/'`sha3.cpp
+	$(am__mv) $(DEPDIR)/cudaminer-sha3.Tpo $(DEPDIR)/cudaminer-sha3.Po
+#	source='sha3.cpp' object='cudaminer-sha3.o' libtool=no \
+#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
+#	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cudaminer_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o cudaminer-sha3.o `test -f 'sha3.cpp' || echo '$(srcdir)/'`sha3.cpp
+
+cudaminer-sha3.obj: sha3.cpp
+	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cudaminer_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT cudaminer-sha3.obj -MD -MP -MF $(DEPDIR)/cudaminer-sha3.Tpo -c -o cudaminer-sha3.obj `if test -f 'sha3.cpp'; then $(CYGPATH_W) 'sha3.cpp'; else $(CYGPATH_W) '$(srcdir)/sha3.cpp'; fi`
+	$(am__mv) $(DEPDIR)/cudaminer-sha3.Tpo $(DEPDIR)/cudaminer-sha3.Po
+#	source='sha3.cpp' object='cudaminer-sha3.obj' libtool=no \
+#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
+#	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cudaminer_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o cudaminer-sha3.obj `if test -f 'sha3.cpp'; then $(CYGPATH_W) 'sha3.cpp'; else $(CYGPATH_W) '$(srcdir)/sha3.cpp'; fi`
 
 cudaminer-scrypt-jane.o: scrypt-jane.cpp
 	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cudaminer_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT cudaminer-scrypt-jane.o -MD -MP -MF $(DEPDIR)/cudaminer-scrypt-jane.Tpo -c -o cudaminer-scrypt-jane.o `test -f 'scrypt-jane.cpp' || echo '$(srcdir)/'`scrypt-jane.cpp
